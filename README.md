@@ -1,3 +1,4 @@
+```markdown
 # News Explorer Server
 
 A Node.js backend server for a news search application that allows authenticated users to browse articles from a news API and save them to their profile.
@@ -23,18 +24,20 @@ A Node.js backend server for a news search application that allows authenticated
 ```
 .
 ├── app.js                 # Application entry point
-├── package.json          # Project dependencies
-├── .gitignore           # Git ignore file
-├── controllers/         # Route handlers
-│   └── users.js        # User controller logic
-├── models/             # Database schemas
-│   ├── users.js        # User schema (name, email, password, avatar, articles)
-│   └── cards.js        # Article/Card schema (title, description, image, url, source, etc.)
-├── routes/             # API routes
-│   ├── index.js        # Root routes
-│   └── users.js        # User-related routes (auth, profile, articles)
-└── utils/              # Utility functions
-    └── errors.js       # Error handling
+├── package.json           # Project dependencies
+├── .gitignore             # Git ignore file
+├── controllers/           # Route handlers
+│   ├── users.js           # User controller logic
+│   └── cards.js           # Card (article) controller logic
+├── models/                # Database schemas
+│   ├── users.js           # User schema (name, email, password, avatar, articles)
+│   └── cards.js           # Article/Card schema (title, description, image, url, source, etc.)
+├── routes/                # API routes
+│   ├── index.js           # Root routes
+│   ├── users.js           # User-related routes (auth, profile)
+│   └── cards.js           # Card-related routes (create, list, delete)
+└── utils/                 # Utility functions
+    └── errors.js          # Error handling
 ```
 
 ## Database Schema
@@ -44,7 +47,6 @@ A Node.js backend server for a news search application that allows authenticated
 - `email`: String (required, unique, validated)
 - `password`: String (required, hashed with bcryptjs)
 - `avatar`: String (required, must be valid URL)
-- `articles`: Array of references to saved Card documents
 
 ### Card (Article) Schema
 - `owner`: Reference to User (required)
@@ -88,23 +90,33 @@ A Node.js backend server for a news search application that allows authenticated
 
 ## Usage
 
-The server will run on `http://localhost:3000` by default.
+By default, the app runs on http://localhost:3000.
 
-### Key Endpoints (Example structure)
-- `POST /users/signup` - Register new user
-- `POST /users/signin` - Login user
-- `GET /users/me` - Get current user profile
-- `POST /cards` - Save an article
-- `GET /cards` - Get user's saved articles
-- `DELETE /cards/:cardId` - Delete a saved article
+### Key Endpoints
+- `POST /api/users/signup` - Register new user
+- `POST /api/users/login` - Login user (returns JWT token)
+- `GET /api/users/me` - Get current user profile (protected)
+- `PATCH /api/users/me` - Update profile (protected)
+- `GET /api/cards` - Get user's saved articles (protected)
+- `POST /api/cards` - Save an article (protected)
+- `DELETE /api/cards/:cardId` - Delete a saved article (protected)
 
-## Frontend Integration
+## Development Status
 
-The frontend should:
-1. Fetch articles from the news API (or request from this backend)
-2. Display articles in a modal with full information
-3. On save, send the complete article data to the backend
-4. Retrieve saved articles from `/cards` endpoint when viewing user profile
+- Core user authentication and profile endpoints have been implemented.
+- The Card model and basic card controller/routes (`GET`, `POST`, `DELETE`) are integrated into the backend.
+- **Current focus**: Implementing API-to-frontend connectivity. Ongoing work includes:
+   - Validating endpoints return the full article payload expected by the client.
+   - Standardizing request/response schemas for save/load operations.
+   - Configuring CORS and JWT token flow to enable frontend authentication and access to protected routes.
+
+A Postman collection and example client code snippets are available to demonstrate authentication patterns and `/api/cards` endpoint usage.
+
+## Frontend Integration Notes
+
+- **Authentication**: The frontend must obtain a JWT token from `POST /api/users/login` and include it in the `Authorization: Bearer <token>` header on all protected requests.
+- **Saving articles**: Submit complete article payloads to `POST /api/cards` with the following required fields: `title`, `description`, `image`, `url`, `source`, `publishedAt`.
+- **Retrieving articles**: Call `GET /api/cards` to fetch all saved articles for the authenticated user. Responses contain an array of card objects ready for rendering.
 
 ## Security Considerations
 
@@ -122,3 +134,5 @@ The frontend should:
 ## Author
 
 Ricardo Vega Jr.
+
+```

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const usersRouter = require('./routes/users');
+const cardsRouter = require('./routes/cards');
 
 const { PORT = 3001, MONGODB_URI = 'mongodb://127.0.0.1:27017/newsrv' } = process.env;
 
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // Routes
 app.use('/api/users', usersRouter);
+app.use('/api/cards', cardsRouter);
 
 // 404 fallback
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
