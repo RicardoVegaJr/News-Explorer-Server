@@ -32,12 +32,13 @@ const auth = (req, res, next) => {
 
 const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
-  User.findById(_id)
+  return User.findById(_id)
     .then((user) => {
       if (!user) throw new NotFoundError(errorMessages.NOT_FOUND);
       res.status(200).send(user);
+      return user;
     })
-    .catch(next);
+    .catch((err) => next(err));
 };
 
 const createUser = (req, res, next) => {
@@ -45,7 +46,7 @@ const createUser = (req, res, next) => {
   if (!name || !avatar || !email || !password) {
     return next(new BadRequestError(errorMessages.BAD_REQUEST));
   }
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hashedPassword) =>
       User.create({ name, avatar, email, password: hashedPassword })
@@ -54,6 +55,7 @@ const createUser = (req, res, next) => {
       const userObject = user.toObject();
       delete userObject.password;
       res.status(201).send(userObject);
+      return userObject;
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -74,6 +76,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.status(200).send({ token });
+      return token;
     })
     .catch(() => next(new UnauthorizedError(errorMessages.UNAUTHORIZED)));
 };
@@ -86,10 +89,11 @@ const updateProfile = (req, res, next) => {
   if (name) updateFields.name = name;
   if (avatar) updateFields.avatar = avatar;
 
-  User.findByIdAndUpdate(userId, { $set: updateFields }, { new: true, runValidators: true })
+  return User.findByIdAndUpdate(userId, { $set: updateFields }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) throw new NotFoundError(errorMessages.NOT_FOUND);
       res.status(200).send(user);
+      return user;
     })
     .catch((err) => {
       if (err.name === 'ValidationError') return next(new BadRequestError(errorMessages.BAD_REQUEST));

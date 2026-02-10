@@ -1,6 +1,7 @@
+const jwt = require('jsonwebtoken');
 const { login } = require('../controllers/users');
 const User = require('../models/users');
-const jwt = require('jsonwebtoken');
+
 
 jest.mock('../models/users');
 jest.mock('jsonwebtoken');

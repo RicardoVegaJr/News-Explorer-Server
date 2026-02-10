@@ -10,9 +10,12 @@ const errorMessages = {
 
 const getCards = (req, res, next) => {
   const { _id } = req.user;
-  Card.find({ owner: _id })
-    .then((cards) => res.status(200).json(cards))
-    .catch(next);
+  return Card.find({ owner: _id })
+    .then((cards) => {
+      res.status(200).json(cards);
+      return cards;
+    })
+    .catch((err) => next(err));
 };
 
 const createCard = (req, res, next) => {
@@ -23,7 +26,7 @@ const createCard = (req, res, next) => {
     return next(new BadRequestError(errorMessages.BAD_REQUEST));
   }
 
-  Card.create({
+  return Card.create({
     owner: _id,
     title,
     description,
@@ -32,15 +35,18 @@ const createCard = (req, res, next) => {
     source,
     publishedAt,
   })
-    .then((card) => res.status(201).json(card))
-    .catch(next);
+    .then((card) => {
+      res.status(201).json(card);
+      return card;
+    })
+    .catch((err) => next(err));
 };
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
 
-  Card.findById(cardId)
+  return Card.findById(cardId)
     .then((card) => {
       if (!card) throw new NotFoundError(errorMessages.NOT_FOUND);
       if (card.owner.toString() !== _id) {
@@ -48,8 +54,11 @@ const deleteCard = (req, res, next) => {
       }
       return Card.findByIdAndDelete(cardId);
     })
-    .then((card) => res.status(200).json(card))
-    .catch(next);
+    .then((card) => {
+      res.status(200).json(card);
+      return card;
+    })
+    .catch((err) => next(err));
 };
 
 module.exports = { getCards, createCard, deleteCard };

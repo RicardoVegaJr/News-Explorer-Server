@@ -14,6 +14,12 @@ module.exports = {
         sourceType: "script",
       },
     },
+    {
+      env: {
+        jest: true,
+      },
+      files: ["__tests__/**/*.js"],
+    },
   ],
   parserOptions: {
     ecmaVersion: "latest",
@@ -27,5 +33,6 @@ module.exports = {
             },
         ],
         "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+        "max-classes-per-file": "off",
   },
 };
